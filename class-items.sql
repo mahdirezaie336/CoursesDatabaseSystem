@@ -135,4 +135,6 @@ insert into HomeworkQuestion (homework_id, question_id) values (2, 2);
 insert into HomeworkQuestion (homework_id, question_id) values (2, 3);
 insert into HomeworkQuestion (homework_id, question_id) values (3, 3);
 insert into HomeworkQuestion (homework_id, question_id) values (3, 4);
+insert into HomeworkQuestion (homework_id, question_id) values (4, 1);
+insert into HomeworkQuestion (homework_id, question_id) values (4, 2);
 

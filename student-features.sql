@@ -132,7 +132,63 @@ begin
     end if;
 end;
 
+# Student can submit their answer to homework
+create procedure student_submit_homework (in
+    token varchar(512),
+    hw_id int,
+    q_id int,
+    ans varchar(512)
+)
+begin
+    declare deadline datetime;
+
+    # Check if user is logged in as student
+    if check_student_login(token) then
+        # Check if the student is allowed to this homework
+        if not exists(
+            select *
+            from Homework H
+                join Course C on H.course_id = C.course_id
+                join Takes T on C.course_id = T.course_id
+                where H.homework_id = hw_id and student_no = get_student(token)
+            ) then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Permission Denied';
+        end if;
+
+        # Check if the student if in allowed interval
+        select deadline into deadline from Homework H where H.homework_id = hw_id;
+
+        if now() > deadline then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not allowed at this time';
+        end if;
+
+        # Check if previously uploaded
+        if exists(
+            select *
+            from HomeworkAnswer HA
+            where HA.homework_id = hw_id and
+                  HA.student_no = get_student(token) and
+                  HA.question_id = q_id) then
+
+            update HomeworkAnswer
+            set answer = ans
+            where HomeworkAnswer.homework_id = hw_id and
+                  HomeworkAnswer.student_no = get_student(token) and
+                  HomeworkAnswer.question_id = q_id;
+        else
+            insert into HomeworkAnswer (student_no, homework_id, question_id, answer)
+            values (get_student(token), hw_id, q_id, ans);
+        end if;
+
+    else
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
+    end if;
+end;
+
 call student_view_class_homeworks('98482979514914d31ae7fbc2b9558717');
 call student_view_class_quizzes('98482979514914d31ae7fbc2b9558717');
 call student_start_quiz('98482979514914d31ae7fbc2b9558717', 4);
+call student_review_quiz('98482979514914d31ae7fbc2b9558717', 4);
+call student_submit_homework('98482979514914d31ae7fbc2b9558717', 4, 1, 'My Answer');
+
 
