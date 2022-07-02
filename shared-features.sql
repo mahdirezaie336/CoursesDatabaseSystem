@@ -15,14 +15,14 @@ create table if not exists ProfessorLogins (
 SET GLOBAL log_bin_trust_function_creators = 1;
 
 # User login function
-create function user_login (user_no varchar(7), password_md5 varchar(512)) returns varchar(512)
+create function user_login (user_no varchar(7), password varchar(512)) returns varchar(512)
 begin
     # Create a random token
     declare token varchar(512);
     set token = md5(rand());
 
     # If the user is a student
-    if exists(select * from Student where student_no=user_no and password=password_md5) then
+    if exists(select * from Student S where student_no=user_no and S.password=md5(password)) then
         # If already exists in table
         while exists(select * from StudentLogins SL where SL.token=token) do
             select md5(rand()) into token;
@@ -30,7 +30,7 @@ begin
 
         # Inserting logged in student into the table
         insert into StudentLogins values (token, user_no, now());
-    elseif exists(select * from Professor where professor_no=user_no and password=password_md5) then
+    elseif exists(select * from Professor P where professor_no=user_no and P.password=md5(password)) then
         # If already exists in table
         while exists(select * from ProfessorLogins PL where PL.token=token) do
             select md5(rand()) into token;
