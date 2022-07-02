@@ -41,7 +41,6 @@ begin
     else
         # If credentials are invalid
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid Credentials';
-        return '0';
     end if;
 
     return token;
@@ -64,21 +63,30 @@ begin
 end;
 
 # Change password function
-create function change_password (token varchar(512), new_password_md5 varchar(512)) returns int
+create function change_password (token varchar(512), new_password varchar(512)) returns int
 begin
+    # If the password does not satisfy the conditions
+    if not new_password REGEXP '^(?=.*[A-Z])(?=.*d)(?=.*[a-z]).{8,20}$' then
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Weak Password';
+    end if;
+
     # If user is a student
     if exists(select * from StudentLogins SL where SL.token=token) then
         update Student
-        set password=new_password_md5
+        set password=md5(new_password)
         where student_no = (select student_no from StudentLogins SL where SL.token=token);
     # If user if a professor
     elseif exists(select * from ProfessorLogins PL where PL.token=token) then
         update Professor
-        set password=new_password_md5
+        set password=md5(new_password)
         where professor_no = (select professor_no from ProfessorLogins PL where PL.token=token);
-    # If non of above raise error
+    # If non of above, raise error
     else
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
     end if;
     return 0;
 end;
+
+
+
+select user_login('9212001', '501fd53c715b4663282d5bc936c9db49');
