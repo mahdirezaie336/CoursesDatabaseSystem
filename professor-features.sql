@@ -104,6 +104,32 @@ begin
     end if;
 end;
 
+# Show answers to quiz
+create procedure show_quiz_answers (in
+    token varchar(512),
+    q_id int
+)
+begin
+    if check_professor_login(token) then
+        # Checking if the quiz is for the professor
+        if not exists(select *
+                      from Quiz Q
+                        join Course C on Q.course_id = C.course_id
+                      where C.professor_no = get_professor(token) and
+                            Q.quiz_id = q_id) then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Access Denied';
+        end if;
+
+        select Q2.quiz_id, student_no, question_id, choice
+        from Course C
+            join Quiz Q2 on C.course_id = Q2.course_id
+            join QuizQuestionAnswer QQA on Q2.quiz_id = QQA.quiz_id
+        where Q2.quiz_id = q_id and professor_no = get_professor(token);
+    else
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
+    end if;
+end;
+
 select user_login('12001', '3795148131Aa');
 call view_class_members('43c5b1dfd5079b426167a2ef05e47c88');
 call view_class_quizzes('43c5b1dfd5079b426167a2ef05e47c88');
@@ -129,3 +155,4 @@ call create_quiz(
     '2022-07-10 01:00:00',
     50
     );
+call show_quiz_answers('43c5b1dfd5079b426167a2ef05e47c88', 8);
