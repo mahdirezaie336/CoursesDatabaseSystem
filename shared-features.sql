@@ -87,8 +87,29 @@ begin
     return 0;
 end;
 
-
+# Procedure to show courses
+create procedure view_courses (in token varchar(512))
+begin
+    # If user is a student
+    if exists(select * from StudentLogins SL where SL.token=token) then
+        select T.course_id, course_name
+        from Takes T join Course C on C.course_id = T.course_id
+        where T.student_no = (select student_no
+                              from StudentLogins SL
+                              where SL.token=token);
+    # If user if a professor
+    elseif exists(select * from ProfessorLogins PL where PL.token=token) then
+        select course_id, course_name
+        from Course C
+        where professor_no = (select professor_no
+                              from ProfessorLogins PL
+                              where PL.token=token);
+    # If non of above raise error
+    else
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
+    end if;
+end;
 
 select user_login('9212001', '501fd53c715b4663282d5bc936c9db49');
 select change_password('5d94e97c3cd65f82d8e8c79754dfe82f', 'A124Ab22a');
-select md5('A');
+call view_courses('5d94e97c3cd65f82d8e8c79754dfe82f');
