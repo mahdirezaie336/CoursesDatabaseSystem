@@ -137,7 +137,7 @@ create procedure show_homework_answers (in
 )
 begin
     if check_professor_login(token) then
-        # Checking if the quiz is for the professor
+        # Checking if the homework is for the professor
         if not exists(select *
                       from Homework H
                         join Course C on H.course_id = C.course_id
@@ -152,6 +152,34 @@ begin
             join Course C2 on H2.course_id = C2.course_id
         where professor_no = get_professor(token) and
               H2.homework_id = hw_id;
+    else
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
+    end if;
+end;
+
+# Professor can give a score to any homework they want
+create procedure give_score_homework(in
+    token varchar(512),
+    hw_id int,
+    stu_id char(7),
+    q_id int,
+    gr float
+)
+begin
+    if check_professor_login(token) then
+        # Checking if the homework is for the professor
+        if not exists(select *
+                      from HomeworkAnswer HA
+                        join Homework H on H.homework_id = HA.homework_id
+                        join Course C on H.course_id = C.course_id
+                      where C.professor_no = get_professor(token) and
+                            H.homework_id = hw_id) then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Access Denied';
+        end if;
+
+        update HomeworkAnswer
+        set grade = gr
+        where homework_id = hw_id and student_no = stu_id and question_id = q_id;
     else
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
     end if;
@@ -182,5 +210,7 @@ call create_quiz(
     '2022-07-10 01:00:00',
     50
     );
+
 call show_quiz_answers('43c5b1dfd5079b426167a2ef05e47c88', 8);
 call show_homework_answers('43c5b1dfd5079b426167a2ef05e47c88', 7);
+# call give_score_homework('43c5b1dfd5079b426167a2ef05e47c88', 1, );
