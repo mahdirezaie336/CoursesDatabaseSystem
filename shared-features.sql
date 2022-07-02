@@ -114,7 +114,7 @@ begin
     end if;
 end;
 
-select user_login('9212001', 'A124Ab22a');
-select change_password('98482979514914d31ae7fbc2b9558717', 'A124Ab22a');
-call view_courses('98482979514914d31ae7fbc2b9558717');
+select user_login('9212001', '2744740129Me');
+select change_password('bff6a40057db510814a7b6d1ebe345eb', '2744740129Me');
+call view_courses('bff6a40057db510814a7b6d1ebe345eb');
 select user_logout('A');

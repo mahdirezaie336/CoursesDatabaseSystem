@@ -18,7 +18,6 @@ create table if not exists Question (
     question_body varchar(512),
     answer_description varchar(512)
 );
-# TODO: Create triggers to add from subclasses
 
 create table if not exists QuadraticQuestion (
     question_id int primary key,
