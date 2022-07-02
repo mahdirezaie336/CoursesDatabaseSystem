@@ -87,6 +87,50 @@ begin
     end if;
 end;
 
+# Students can take quiz after they have started the quiz
+create procedure student_answer_quiz (in
+    token varchar(512),
+    quiz_id int,
+    question_id int,
+    answer int
+)
+begin
+    declare start_time datetime;
+    declare finish_time datetime;
+    # Check if user is logged in as student
+    if check_student_login(token) then
+        # Check if student is allowed to this quiz
+        if not exists (select *
+                       from Quiz Q
+                            join Course C on Q.course_id = C.course_id
+                            join Takes T on C.course_id = T.course_id
+                       where T.student_no = get_student(token) and
+                                Q.quiz_id = quiz_id) then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Permission Denied';
+        end if;
+
+        select start_datetime into start_time from Quiz Q where Q.quiz_id = quiz_id;
+        select finish_datetime into finish_time from Quiz Q where Q.quiz_id = quiz_id;
+
+        # Check if student can start the quiz at this time
+        if now() not between start_time and finish_time then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not allowed at this time';
+        end if;
+
+        # Check if they did not started the quiz
+        if not exists(select * from QuizAnswer QA where QA.quiz_id = quiz_id and
+                                                    QA.student_no = get_student(token)) then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You did not start the quiz';
+        end if;
+
+        # Submit the answer
+        insert into QuizQuestionAnswer (student_no, quiz_id, question_id, choice)
+        values (get_student(token), quiz_id, question_id, answer);
+    else
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
+    end if;
+end;
+
 # Students can review their quiz
 create procedure student_review_quiz (in
     token varchar(512),
@@ -190,5 +234,5 @@ call student_view_class_quizzes('98482979514914d31ae7fbc2b9558717');
 call student_start_quiz('98482979514914d31ae7fbc2b9558717', 4);
 call student_review_quiz('98482979514914d31ae7fbc2b9558717', 4);
 call student_submit_homework('98482979514914d31ae7fbc2b9558717', 4, 1, 'My Answer');
-
-
+call student_answer_quiz('98482979514914d31ae7fbc2b9558717', 4, 11, '1');
+call student_answer_quiz('98482979514914d31ae7fbc2b9558717', 4, 12, '1');

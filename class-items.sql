@@ -112,6 +112,9 @@ insert into QuestionQuiz (quiz_id, question_id) values (3, 11);
 insert into QuestionQuiz (quiz_id, question_id) values (5, 11);
 insert into QuestionQuiz (quiz_id, question_id) values (5, 12);
 insert into QuestionQuiz (quiz_id, question_id) values (5, 13);
+insert into QuestionQuiz (quiz_id, question_id) values (4, 11);
+insert into QuestionQuiz (quiz_id, question_id) values (4, 12);
+insert into QuestionQuiz (quiz_id, question_id) values (4, 13);
 
 insert into Homework (homework_name, course_id, deadline)
 values ('HW1', '12000001', '2022-01-01 23:59:59');
