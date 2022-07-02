@@ -18,6 +18,7 @@ create table QuizQuestionAnswer (
     quiz_id int,
     question_id int,
     choice int,
+    grade int,
 
     primary key (student_no, quiz_id, question_id),
     foreign key (student_no, quiz_id) references QuizAnswer(student_no, quiz_id),
@@ -25,6 +26,18 @@ create table QuizQuestionAnswer (
 
     check ( choice in (1, 2, 3, 4) )
 );
+
+create trigger close_quiz after insert on Quiz for each row
+begin
+    create event e on schedule at new.finish_datetime do
+    begin
+        update QuizQuestionAnswer
+        set grade = if((select correct_answer
+                        from QuadraticQuestion QQ
+                        where QQ.question_id = QuizQuestionAnswer.question_id), 1, 0)
+        where quiz_id = new.quiz_id;
+    end;
+end;
 
 # This is a 3 way relation between student, question and homework.
 create table HomeworkAnswer (
@@ -41,3 +54,5 @@ create table HomeworkAnswer (
 );
 
 # alter table HomeworkAnswer add grade float;
+create event 'Helli' on schedule at '' do
+    select now();
