@@ -54,17 +54,17 @@ create table if not exists HomeworkQuestion (
 );
 
 insert into Quiz (quiz_name, course_id, start_datetime, finish_datetime, duration)
-values ('Quiz - 1', 12000001, '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
+values ('Quiz - 1', '12000001', '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
 insert into Quiz (quiz_name, course_id, start_datetime, finish_datetime, duration)
-values ('Quiz - 2', 12000001, '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
+values ('Quiz - 2', '12000001', '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
 insert into Quiz (quiz_name, course_id, start_datetime, finish_datetime, duration)
-values ('Quiz - 1', 12000002, '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
+values ('Quiz - 1', '12000005', '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
 insert into Quiz (quiz_name, course_id, start_datetime, finish_datetime, duration)
-values ('Quiz - 2', 12000002, '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
+values ('Quiz - 2', '12000005', '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
 insert into Quiz (quiz_name, course_id, start_datetime, finish_datetime, duration)
-values ('Quiz - 3', 12000002, '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
+values ('Quiz - 3', '12000005', '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
 insert into Quiz (quiz_name, course_id, start_datetime, finish_datetime, duration)
-values ('Quiz - 1', 12000003, '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
+values ('Quiz - 1', '17000001', '2022-01-01 01:01:01', '2023-01-01 01:01:01', 60);
 
 insert into Question (question_id, question_body, answer_description)
 values (1, 'What is 2+2?', '5');
@@ -119,11 +119,11 @@ values ('HW2', '12000001', '2023-01-01 23:59:59');
 insert into Homework (homework_name, course_id, deadline)
 values ('HW3', '12000001', '2023-07-09 23:59:59');
 insert into Homework (homework_name, course_id, deadline)
-values ('HW1', '12000002', '2022-01-01 23:59:59');
+values ('HW1', '12000005', '2022-01-01 23:59:59');
 insert into Homework (homework_name, course_id, deadline)
-values ('HW2', '12000002', '2023-01-01 23:59:59');
+values ('HW2', '12000005', '2023-01-01 23:59:59');
 insert into Homework (homework_name, course_id, deadline)
-values ('HW3', '12000002', '2023-07-09 23:59:59');
+values ('HW3', '12000005', '2023-07-09 23:59:59');
 
 insert into HomeworkQuestion (homework_id, question_id) values (1, 1);
 insert into HomeworkQuestion (homework_id, question_id) values (1, 2);
