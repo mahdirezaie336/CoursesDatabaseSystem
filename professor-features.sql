@@ -78,10 +78,31 @@ begin
     end if;
 end;
 
+# Professor can create quiz
 create procedure create_quiz (in
     token varchar(512),
+    quiz_name varchar(512),
+    course_id char(8),
+    start_datetime datetime,
+    finish_datetime datetime,
+    duration int
+)
+begin
+    if check_professor_login(token) then
+        # Checking if the course is for the professor
+        if not exists(select *
+                      from Course C
+                      where C.professor_no = get_professor(token) and
+                            C.course_id = course_id) then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Access Denied';
+        end if;
 
-    )
+        insert into Quiz (quiz_name, course_id, start_datetime, finish_datetime, duration)
+        values (quiz_name, course_id, start_datetime, finish_datetime, duration);
+    else
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
+    end if;
+end;
 
 select user_login('12001', '3795148131Aa');
 call view_class_members('43c5b1dfd5079b426167a2ef05e47c88');
@@ -99,4 +120,12 @@ call create_homework(
     'HW6',
     '12000004',
     '2022-07-09 23:59:59'
+    );
+call create_quiz(
+    '43c5b1dfd5079b426167a2ef05e47c88',
+    'Quiz Final',
+    '12000004',
+    '2022-07-09 23:59:59',
+    '2022-07-10 01:00:00',
+    50
     );
