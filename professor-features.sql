@@ -104,7 +104,7 @@ begin
     end if;
 end;
 
-# Show answers to quiz
+# Professor can see answers to quiz
 create procedure show_quiz_answers (in
     token varchar(512),
     q_id int
@@ -125,6 +125,33 @@ begin
             join Quiz Q2 on C.course_id = Q2.course_id
             join QuizQuestionAnswer QQA on Q2.quiz_id = QQA.quiz_id
         where Q2.quiz_id = q_id and professor_no = get_professor(token);
+    else
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
+    end if;
+end;
+
+# Professor can see answers to homeworks
+create procedure show_homework_answers (in
+    token varchar(512),
+    hw_id int
+)
+begin
+    if check_professor_login(token) then
+        # Checking if the quiz is for the professor
+        if not exists(select *
+                      from Homework H
+                        join Course C on H.course_id = C.course_id
+                      where C.professor_no = get_professor(token) and
+                            H.homework_id = hw_id) then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Access Denied';
+        end if;
+
+        select *
+        from HomeworkAnswer HA
+            join Homework H2 on H2.homework_id = HA.homework_id
+            join Course C2 on H2.course_id = C2.course_id
+        where professor_no = get_professor(token) and
+              H2.homework_id = hw_id;
     else
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
     end if;
@@ -156,3 +183,4 @@ call create_quiz(
     50
     );
 call show_quiz_answers('43c5b1dfd5079b426167a2ef05e47c88', 8);
+call show_homework_answers('43c5b1dfd5079b426167a2ef05e47c88', 7);
