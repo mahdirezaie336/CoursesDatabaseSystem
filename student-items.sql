@@ -32,9 +32,12 @@ create table HomeworkAnswer (
     homework_id int,
     question_id int,
     answer varchar(512),
+    grade float,
 
     primary key (student_no, homework_id, question_id),
     foreign key (homework_id) references Homework(homework_id),
     foreign key (question_id) references ShortAnswerQuestion(question_id),
     foreign key (student_no) references Student(student_no)
 );
+
+# alter table HomeworkAnswer add grade float;
