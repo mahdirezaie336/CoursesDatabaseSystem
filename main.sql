@@ -29,7 +29,9 @@ create table if not exists Professor (
 create table if not exists Course (
     course_id char(8) primary key,
     course_name varchar(512),
-    professor_no char(5) references Professor
+    professor_no char(5),
+
+    foreign key (professor_no) references Professor (professor_no)
 );
 
 create table if not exists Takes (
