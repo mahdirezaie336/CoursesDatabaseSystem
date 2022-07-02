@@ -4,7 +4,7 @@ use EducationalSystem;
 create table QuizAnswer (
     student_no char(7),
     quiz_id int,
-    answer_datetime datetime,
+    start_datetime datetime,
     finished int default 0,
 
     primary key (student_no, quiz_id),
