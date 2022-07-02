@@ -14,6 +14,7 @@ create table if not exists ProfessorLogins (
 
 SET GLOBAL log_bin_trust_function_creators = 1;
 
+# User login function
 create function user_login (user_no varchar(7), password_md5 varchar(512)) returns varchar(512)
 begin
     # Create a random token
@@ -46,15 +47,38 @@ begin
     return token;
 end;
 
-create function user_logout (token varchar(255)) returns int
+# User logout function
+create function user_logout (token varchar(512)) returns int
 begin
+    # If user is a student
     if exists(select * from StudentLogins SL where SL.token=token) then
         delete from StudentLogins SL where SL.token=token;
+    # If user if a professor
     elseif exists(select * from ProfessorLogins PL where PL.token=token) then
         delete from ProfessorLogins PL where PL.token=token;
+    # If non of above raise error
     else
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
-        return 1;
+    end if;
+    return 0;
+end;
+
+# Change password function
+create function change_password (token varchar(512), new_password_md5 varchar(512)) returns int
+begin
+    # If user is a student
+    if exists(select * from StudentLogins SL where SL.token=token) then
+        update Student
+        set password=new_password_md5
+        where student_no = (select student_no from StudentLogins SL where SL.token=token);
+    # If user if a professor
+    elseif exists(select * from ProfessorLogins PL where PL.token=token) then
+        update Professor
+        set password=new_password_md5
+        where professor_no = (select professor_no from ProfessorLogins PL where PL.token=token);
+    # If non of above raise error
+    else
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
     end if;
     return 0;
 end;
