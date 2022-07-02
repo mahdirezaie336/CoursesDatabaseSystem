@@ -9,6 +9,8 @@ create table if not exists Student (
     birth_date date,
     mobile varchar(11),
     major varchar(512),
+    first_name_en varchar(512),
+    last_name_en varchar(512),
     password varchar(512),
     email varchar(512)
 );
@@ -22,6 +24,8 @@ create table if not exists Professor (
     mobile varchar(11),
     department varchar(512),
     title varchar(512),
+    first_name_en varchar(512),
+    last_name_en varchar(512),
     password varchar(512),
     email varchar(512)
 );
@@ -37,22 +41,18 @@ create table if not exists Course (
 create table if not exists Takes (
     course_id char(8),
     student_no char(7),
+
     primary key (student_no, course_id),
     foreign key (student_no) references Student(student_no),
     foreign key (course_id) references Course(course_id)
 );
 
-# alter table Student add first_name_en varchar(512);
-# alter table Student add last_name_en varchar(512);
-# alter table Professor add first_name_en varchar(512);
-# alter table Professor add last_name_en varchar(512);
-
 update Student
 set password = MD5(
     concat(
         national_code,
-        upper(left(name_en, 1)),
-        lower(left(SUBSTRING_INDEX(name_en, ' - ', -1), 1))
+        upper(left(first_name_en, 1)),
+        lower(left(last_name_en, 1))
         )
     );
 
@@ -60,8 +60,8 @@ update Professor
 set password = MD5(
     concat(
         national_code,
-        upper(left(name_en, 1)),
-        lower(left(SUBSTRING_INDEX(name_en, ' - ', -1), 1))
+        upper(left(first_name_en, 1)),
+        lower(left(last_name_en, 1))
         )
     );
 
@@ -69,7 +69,7 @@ update Student
 set email = concat(
     lower(left(name_en, 1)),
     '.',
-    lower(SUBSTRING_INDEX(name_en, ' - ', -1)),
+    lower(last_name_en),
     '@aut.ac.ir'
     );
 
@@ -77,7 +77,7 @@ update Professor
 set email = concat(
     lower(left(name_en, 1)),
     '.',
-    lower(SUBSTRING_INDEX(name_en, ' - ', -1)),
+    lower(last_name_en),
     '@aut.ac.ir'
     );
 
