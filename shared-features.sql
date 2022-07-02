@@ -39,7 +39,7 @@ begin
         # Inserting logged in professor into the table
         insert into ProfessorLogins values (@token, user_no, now());
     else
-
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid Credentials';
     end if;
 
     return token;
