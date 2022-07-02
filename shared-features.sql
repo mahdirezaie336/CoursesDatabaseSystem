@@ -12,32 +12,35 @@ create table if not exists ProfessorLogins (
     login_datetime datetime
 );
 
-create function user_login (user_no varchar(7), password_md5 varchar(512)) returns varchar(512)
+SET GLOBAL log_bin_trust_function_creators = 1;
+
+create function user_login (user_no varchar(7), password_md5 varchar(512))
+    returns varchar(512)
 begin
     # Create a random token
-    set @token = md5(rand());
+    declare token varchar(512);
+    set token = md5(rand());
 
     # If the user is a student
     if exists(select * from Student where student_no=user_no and password=password_md5) then
         # If already exists in table
-        while exists(select * from StudentLogins SL where SL.token=@token) do
-            select @token = md5(rand());
+        while exists(select * from StudentLogins SL where SL.token=token) do
+            select md5(rand()) into token;
         end while;
 
         # Inserting logged in student into the table
-        insert into StudentLogins values (@token, user_no, now());
-    end if;
-
-    # If the user is a professor
-    if exists(select * from Professor where professor_no=user_no and password=password_md5) then
+        insert into StudentLogins values (token, user_no, now());
+    elseif exists(select * from Professor where professor_no=user_no and password=password_md5) then
         # If already exists in table
-        while exists(select * from ProfessorLogins PL where PL.token=@token) do
-            select @token = md5(rand());
+        while exists(select * from ProfessorLogins PL where PL.token=token) do
+            select md5(rand()) into token;
         end while;
 
-        # Inserting logged in student into the table
+        # Inserting logged in professor into the table
         insert into ProfessorLogins values (@token, user_no, now());
+    else
+
     end if;
 
+    return token;
 end;
-
