@@ -37,7 +37,7 @@ begin
         end while;
 
         # Inserting logged in professor into the table
-        insert into ProfessorLogins values (@token, user_no, now());
+        insert into ProfessorLogins values (token, user_no, now());
     else
         # If credentials are invalid
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid Credentials';
