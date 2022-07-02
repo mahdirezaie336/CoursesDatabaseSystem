@@ -2,14 +2,18 @@ use EducationalSystem;
 
 create table if not exists StudentLogins (
     token varchar(512) primary key,
-    student_no varchar(7) references Student,
-    login_datetime datetime
+    student_no varchar(7),
+    login_datetime datetime,
+
+    foreign key (student_no) references Student (student_no)
 );
 
 create table if not exists ProfessorLogins (
     token varchar(512) primary key,
-    professor_no varchar(5) references Professor,
-    login_datetime datetime
+    professor_no varchar(5),
+    login_datetime datetime,
+
+    foreign key (professor_no) references Professor (professor_no)
 );
 
 SET GLOBAL log_bin_trust_function_creators = 1;

@@ -3,11 +3,13 @@ use EducationalSystem;
 create table if not exists Quiz (
     quiz_id int primary key auto_increment,
     quiz_name varchar(512),
-    course_id char(8) references Course,
+    course_id char(8),
     start_datetime datetime,
     finish_datetime datetime,
     duration int,
-    finished int default 0
+    finished int default 0,
+
+    foreign key (course_id) references Course (course_id)
 );
 
 # Questions' superclass
@@ -19,39 +21,51 @@ create table if not exists Question (
 # TODO: Create triggers to add from subclasses
 
 create table if not exists QuadraticQuestion (
-    question_id int primary key references Question,
+    question_id int primary key,
     answer_1 varchar(512),
     answer_2 varchar(512),
     answer_3 varchar(512),
     answer_4 varchar(512),
     correct_answer int not null,
+
+    foreign key (question_id) references Question (question_id),
     check ( correct_answer in (1, 2, 3, 4) )
 );
 
 create table if not exists ShortAnswerQuestion (
-    question_id int primary key references Question,
-    correct_answer varchar(512)
+    question_id int primary key,
+    correct_answer varchar(512),
+
+    foreign key (question_id) references Question (question_id)
 );
 
 # Relation between question and quiz
 create table if not exists QuestionQuiz (
-    quiz_id int references Quiz,
-    question_id int references QuadraticQuestion,
-    primary key (quiz_id, question_id)
+    quiz_id int,
+    question_id int,
+
+    primary key (quiz_id, question_id),
+    foreign key (quiz_id) references Quiz(quiz_id),
+    foreign key (question_id) references QuadraticQuestion(question_id)
 );
 
 create table if not exists Homework (
     homework_id int primary key auto_increment,
     homework_name varchar(512),
-    course_id char(8) references Course,
-    deadline datetime
+    course_id char(8),
+    deadline datetime,
+
+    foreign key (course_id) references Course (course_id)
 );
 
 # Relation between homework and Short Answer Question
 create table if not exists HomeworkQuestion (
-    homework_id int references Homework,
-    question_id int references ShortAnswerQuestion,
-    primary key (homework_id, question_id)
+    homework_id int,
+    question_id int,
+
+    primary key (homework_id, question_id),
+    foreign key (homework_id) references Homework (homework_id),
+    foreign key (question_id) references ShortAnswerQuestion (question_id)
 );
 
 insert into Quiz (quiz_name, course_id, start_datetime, finish_datetime, duration)
