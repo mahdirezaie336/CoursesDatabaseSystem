@@ -113,3 +113,4 @@ end;
 select user_login('9212001', '501fd53c715b4663282d5bc936c9db49');
 select change_password('5d94e97c3cd65f82d8e8c79754dfe82f', 'A124Ab22a');
 call view_courses('5d94e97c3cd65f82d8e8c79754dfe82f');
+select user_logout('A');
