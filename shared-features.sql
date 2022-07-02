@@ -66,7 +66,7 @@ end;
 create function change_password (token varchar(512), new_password varchar(512)) returns int
 begin
     # If the password does not satisfy the conditions
-    if not new_password REGEXP '^(?=.*[A-Z])(?=.*d)(?=.*[a-z]).{8,20}$' then
+    if not new_password REGEXP '^(?=.*[A-Z]+)(?=.*[0-9]+)(?=.*[a-z]+).{8,20}$' then
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Weak Password';
     end if;
 
@@ -90,3 +90,5 @@ end;
 
 
 select user_login('9212001', '501fd53c715b4663282d5bc936c9db49');
+select change_password('5d94e97c3cd65f82d8e8c79754dfe82f', 'A124Ab22a');
+select md5('A');
