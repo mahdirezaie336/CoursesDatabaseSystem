@@ -14,8 +14,7 @@ create table if not exists ProfessorLogins (
 
 SET GLOBAL log_bin_trust_function_creators = 1;
 
-create function user_login (user_no varchar(7), password_md5 varchar(512))
-    returns varchar(512)
+create function user_login (user_no varchar(7), password_md5 varchar(512)) returns varchar(512)
 begin
     # Create a random token
     declare token varchar(512);
@@ -39,8 +38,23 @@ begin
         # Inserting logged in professor into the table
         insert into ProfessorLogins values (@token, user_no, now());
     else
+        # If credentials are invalid
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid Credentials';
+        return '0';
     end if;
 
     return token;
+end;
+
+create function user_logout (token varchar(255)) returns int
+begin
+    if exists(select * from StudentLogins SL where SL.token=token) then
+        delete from StudentLogins SL where SL.token=token;
+    elseif exists(select * from ProfessorLogins PL where PL.token=token) then
+        delete from ProfessorLogins PL where PL.token=token;
+    else
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
+        return 1;
+    end if;
+    return 0;
 end;
