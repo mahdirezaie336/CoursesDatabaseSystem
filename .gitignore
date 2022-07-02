@@ -2,3 +2,4 @@
 *.xlsx
 .ipynb_checkpoints
 .idea
+data
