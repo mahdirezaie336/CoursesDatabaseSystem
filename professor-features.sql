@@ -40,7 +40,7 @@ end;
 
 
 
-select user_login('12001', '5593661a793cf7e9044311cfae51945b');
-call view_class_members('201088c547cfdb9855cd949d2bc80f67');
-call view_class_quizzes('201088c547cfdb9855cd949d2bc80f67');
-call view_class_homeworks('201088c547cfdb9855cd949d2bc80f67');
+select user_login('12001', '3795148131Aa');
+call view_class_members('43c5b1dfd5079b426167a2ef05e47c88');
+call view_class_quizzes('43c5b1dfd5079b426167a2ef05e47c88');
+call view_class_homeworks('43c5b1dfd5079b426167a2ef05e47c88');

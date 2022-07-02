@@ -110,7 +110,7 @@ begin
     end if;
 end;
 
-select user_login('9212001', '501fd53c715b4663282d5bc936c9db49');
-select change_password('5d94e97c3cd65f82d8e8c79754dfe82f', 'A124Ab22a');
-call view_courses('5d94e97c3cd65f82d8e8c79754dfe82f');
+select user_login('9212001', 'A124Ab22a');
+select change_password('98482979514914d31ae7fbc2b9558717', 'A124Ab22a');
+call view_courses('98482979514914d31ae7fbc2b9558717');
 select user_logout('A');
