@@ -87,6 +87,51 @@ begin
     end if;
 end;
 
+# Students can review their quiz
+create procedure student_review_quiz (in
+    token varchar(512),
+    quiz_id int
+)
+begin
+    declare start_time datetime;
+    declare finish_time datetime;
+    # Check if user is logged in as student
+    if check_student_login(token) then
+        # Check if student is allowed to this quiz
+        if not exists (select *
+                       from Quiz Q
+                            join Course C on Q.course_id = C.course_id
+                            join Takes T on C.course_id = T.course_id
+                       where T.student_no = get_student(token) and
+                                Q.quiz_id = quiz_id) then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Permission Denied';
+        end if;
+
+        # Check if did not take this quiz
+        if not exists(select * from QuizAnswer QA where QA.quiz_id = quiz_id and
+                                                        QA.student_no = get_student(token)) then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You did not participate in this quiz';
+        end if;
+
+        select start_datetime into start_time from Quiz Q where Q.quiz_id = quiz_id;
+        select finish_datetime into finish_time from Quiz Q where Q.quiz_id = quiz_id;
+
+        # Check if student is in allowed time interval
+        if now() < finish_time then
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not allowed at this time';
+        end if;
+
+        select student_no, quiz_id, QQ.question_id, question_body,
+               correct_answer, choice as 'Your Answer', answer_description
+        from QuizQuestionAnswer QQA
+            join QuadraticQuestion QQ on QQA.question_id = QQ.question_id
+            join Question Q2 on QQ.question_id = Q2.question_id
+        where QQA.quiz_id = quiz_id and QQA.student_no = get_student(token);
+    else
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
+    end if;
+end;
+
 call student_view_class_homeworks('98482979514914d31ae7fbc2b9558717');
 call student_view_class_quizzes('98482979514914d31ae7fbc2b9558717');
 call student_start_quiz('98482979514914d31ae7fbc2b9558717', 4);
