@@ -67,7 +67,7 @@ begin
 end;
 
 # Change password function
-create procedure change_password (in token varchar(512), new_password varchar(512))
+create function change_password (token varchar(512), new_password varchar(512)) returns int
 begin
     # If the password does not satisfy the conditions
     if not new_password REGEXP '^(?=.*[A-Z]+)(?=.*[0-9]+)(?=.*[a-z]+).{8,20}$' then
@@ -88,6 +88,7 @@ begin
     else
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
     end if;
+    return 0;
 end;
 
 # Procedure to show courses
@@ -110,6 +111,17 @@ begin
     # If non of above raise error
     else
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
+    end if;
+end;
+
+create function get_role (token varchar(512)) returns varchar(512)
+begin
+    if exists(select * from StudentLogins SL where SL.token = token) then
+        return 'student';
+    elseif exists(select * from ProfessorLogins PL where PL.token = token) then
+        return 'professor';
+    else
+        return 'invalid';
     end if;
 end;
 
