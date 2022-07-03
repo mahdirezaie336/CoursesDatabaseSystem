@@ -67,7 +67,7 @@ begin
 end;
 
 # Change password function
-create function change_password (token varchar(512), new_password varchar(512)) returns int
+create procedure change_password (in token varchar(512), new_password varchar(512))
 begin
     # If the password does not satisfy the conditions
     if not new_password REGEXP '^(?=.*[A-Z]+)(?=.*[0-9]+)(?=.*[a-z]+).{8,20}$' then
@@ -88,7 +88,6 @@ begin
     else
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
     end if;
-    return 0;
 end;
 
 # Procedure to show courses

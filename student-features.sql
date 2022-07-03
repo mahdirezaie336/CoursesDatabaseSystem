@@ -16,7 +16,10 @@ begin
 end;
 
 # Students can see their homeworks
-create procedure student_view_class_homeworks (in token varchar(512))
+create procedure student_view_class_homeworks (in
+    token varchar(512),
+    c_id varchar(512)
+    )
 begin
     # Check if user is logged in as student
     if check_student_login(token) then
@@ -24,7 +27,8 @@ begin
         from Homework H
             join Course C on H.course_id = C.course_id
             join Takes T on C.course_id = T.course_id
-        where T.student_no = get_student(token);
+        where T.student_no = get_student(token) and
+              T.course_id = c_id;
     else
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not logged in';
     end if;
